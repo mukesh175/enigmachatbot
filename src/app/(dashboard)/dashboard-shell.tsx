@@ -25,19 +25,18 @@ const navItems = [
   { href: "/dashboard/team", label: "Team", icon: UserCog },
 ];
 
-export default function DashboardShell({
-  children,
+function SidebarContent({
+  pathname,
   clientName,
   clientEmail,
+  onNavigate,
 }: {
-  children: React.ReactNode;
+  pathname: string;
   clientName: string;
   clientEmail: string;
+  onNavigate: () => void;
 }) {
-  const pathname = usePathname();
-  const [mobileOpen, setMobileOpen] = useState(false);
-
-  const SidebarContent = (
+  return (
     <>
       <div className="relative p-6 border-b border-surface-border flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -46,7 +45,7 @@ export default function DashboardShell({
           </div>
           <span className="font-semibold text-lg tracking-tight">LeadBot</span>
         </div>
-        <button className="md:hidden text-gray-400" onClick={() => setMobileOpen(false)}>
+        <button className="md:hidden text-gray-400" onClick={onNavigate}>
           <X size={20} />
         </button>
       </div>
@@ -58,7 +57,7 @@ export default function DashboardShell({
             <Link
               key={item.href}
               href={item.href}
-              onClick={() => setMobileOpen(false)}
+              onClick={onNavigate}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors ${
                 active ? "bg-white/10 text-white" : "text-gray-300 hover:text-white hover:bg-white/5"
               }`}
@@ -70,7 +69,7 @@ export default function DashboardShell({
         })}
         <Link
           href="/dashboard/settings"
-          onClick={() => setMobileOpen(false)}
+          onClick={onNavigate}
           className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors ${
             pathname === "/dashboard/settings" ? "bg-white/10 text-white" : "text-gray-300 hover:text-white hover:bg-white/5"
           }`}
@@ -94,22 +93,45 @@ export default function DashboardShell({
       </div>
     </>
   );
+}
+
+export default function DashboardShell({
+  children,
+  clientName,
+  clientEmail,
+}: {
+  children: React.ReactNode;
+  clientName: string;
+  clientEmail: string;
+}) {
+  const pathname = usePathname();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
     <div className="flex min-h-screen bg-[#f6f6fb]">
-      {/* Desktop sidebar */}
+      {/* Desktop sidebar — its own independent component instance */}
       <aside className="hidden md:flex w-64 bg-surface text-white flex-col relative overflow-hidden">
         <div className="absolute inset-0 bg-glow pointer-events-none" />
-        {SidebarContent}
+        <SidebarContent
+          pathname={pathname}
+          clientName={clientName}
+          clientEmail={clientEmail}
+          onNavigate={() => setMobileOpen(false)}
+        />
       </aside>
 
-      {/* Mobile sidebar (slide-over) */}
+      {/* Mobile sidebar (slide-over) — a SEPARATE component instance, not shared */}
       {mobileOpen && (
         <div className="fixed inset-0 z-50 md:hidden">
           <div className="absolute inset-0 bg-black/40" onClick={() => setMobileOpen(false)} />
           <aside className="absolute inset-y-0 left-0 w-64 bg-surface text-white flex flex-col relative overflow-hidden">
             <div className="absolute inset-0 bg-glow pointer-events-none" />
-            {SidebarContent}
+            <SidebarContent
+              pathname={pathname}
+              clientName={clientName}
+              clientEmail={clientEmail}
+              onNavigate={() => setMobileOpen(false)}
+            />
           </aside>
         </div>
       )}
