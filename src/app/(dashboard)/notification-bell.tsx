@@ -69,7 +69,7 @@ export default function NotificationBell() {
         setUnread(0);
         router.push("/dashboard/leads");
       }}
-      className="relative p-2 rounded-xl text-gray-500 hover:bg-gray-100 transition-colors"
+      className="relative p-2 rounded-xl text-white/80 hover:bg-white/10 transition-colors"
       title="New leads"
     >
       <Bell size={19} />

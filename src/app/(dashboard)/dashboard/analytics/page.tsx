@@ -2,6 +2,7 @@ import { db } from "@/db";
 import { conversations, leads, campaigns } from "@/db/schema";
 import { and, eq, gte, inArray, sql } from "drizzle-orm";
 import { requireClientId } from "@/lib/session";
+import AnalyticsCharts from "./analytics-charts";
 
 export const dynamic = "force-dynamic";
 
@@ -94,7 +95,9 @@ export default async function AnalyticsPage() {
           <p className="text-sm text-gray-500">No chat activity in the last 30 days yet.</p>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-card overflow-hidden overflow-x-auto">
+        <>
+          <AnalyticsCharts rows={combined} />
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-card overflow-hidden overflow-x-auto">
           <table className="w-full border-collapse text-sm">
             <thead>
               <tr className="bg-gray-50 text-left text-xs text-gray-500">
@@ -119,7 +122,8 @@ export default async function AnalyticsPage() {
               ))}
             </tbody>
           </table>
-        </div>
+          </div>
+        </>
       )}
     </div>
   );

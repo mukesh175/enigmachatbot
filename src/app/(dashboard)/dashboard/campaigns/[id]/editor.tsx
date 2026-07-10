@@ -195,7 +195,7 @@ export default function CampaignEditor({ campaign }: { campaign: any }) {
         <button
           onClick={handleSave}
           disabled={false}
-          className="bg-brand-gradient text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:opacity-90 transition-opacity"
+          className="bg-accent-gradient text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:opacity-90 transition-opacity"
         >
           Save changes
         </button>

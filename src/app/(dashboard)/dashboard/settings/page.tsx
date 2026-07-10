@@ -21,6 +21,26 @@ const SOUND_OPTIONS = [
   { label: "Silent", freq: 0 },
 ];
 
+const FONT_OPTIONS = [
+  { name: "Inter (Default)", stack: "'Inter', -apple-system, sans-serif", google: "Inter:wght@400;600;700" },
+  { name: "Manrope", stack: "'Manrope', sans-serif", google: "Manrope:wght@400;600;700" },
+  { name: "Poppins", stack: "'Poppins', sans-serif", google: "Poppins:wght@400;600;700" },
+  { name: "Work Sans", stack: "'Work Sans', sans-serif", google: "Work+Sans:wght@400;600;700" },
+  { name: "Outfit", stack: "'Outfit', sans-serif", google: "Outfit:wght@400;600;700" },
+];
+
+function loadGoogleFont(googleParam: string) {
+  const id = "leadbot-font-link";
+  let link = document.getElementById(id) as HTMLLinkElement | null;
+  if (!link) {
+    link = document.createElement("link");
+    link.id = id;
+    link.rel = "stylesheet";
+    document.head.appendChild(link);
+  }
+  link.href = `https://fonts.googleapis.com/css2?family=${googleParam}&display=swap`;
+}
+
 function playTone(freq: number, volume: number) {
   if (freq === 0) return;
   try {
@@ -49,6 +69,7 @@ export default function SettingsPage() {
   const [volume, setVolume] = useState(60);
   const [desktopNotifs, setDesktopNotifs] = useState(false);
   const [accentColor, setAccentColor] = useState("#ed5e4e");
+  const [fontFamily, setFontFamily] = useState(FONT_OPTIONS[0].stack);
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
@@ -65,6 +86,7 @@ export default function SettingsPage() {
     setVolume(Number(localStorage.getItem("leadbot_sound_volume") || 60));
     setDesktopNotifs(localStorage.getItem("leadbot_desktop_notifs") === "on");
     setAccentColor(localStorage.getItem("leadbot_accent_color") || "#ed5e4e");
+    setFontFamily(localStorage.getItem("leadbot_font_family") || FONT_OPTIONS[0].stack);
   }, []);
 
   async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -137,8 +159,16 @@ export default function SettingsPage() {
   function selectAccent(color: string) {
     setAccentColor(color);
     localStorage.setItem("leadbot_accent_color", color);
-    document.documentElement.style.setProperty("--lb-accent", color);
+    document.documentElement.style.setProperty("--accent-color", color);
     toast.show("Accent color updated", "success");
+  }
+
+  function selectFont(font: { name: string; stack: string; google: string }) {
+    setFontFamily(font.stack);
+    localStorage.setItem("leadbot_font_family", font.stack);
+    loadGoogleFont(font.google);
+    document.documentElement.style.setProperty("--app-font", font.stack);
+    toast.show(`Font changed to ${font.name}`, "success");
   }
 
   return (
@@ -153,7 +183,7 @@ export default function SettingsPage() {
             {avatarUrl ? (
               <img src={avatarUrl} className="w-16 h-16 rounded-full object-cover border border-gray-200" alt="" />
             ) : (
-              <div className="w-16 h-16 rounded-full bg-brand-gradient flex items-center justify-center text-white text-xl font-semibold">
+              <div className="w-16 h-16 rounded-full bg-accent-gradient flex items-center justify-center text-white text-xl font-semibold">
                 {session?.user?.name?.[0]?.toUpperCase() || "?"}
               </div>
             )}
@@ -195,6 +225,28 @@ export default function SettingsPage() {
                 {accentColor === c.value && <span className="text-white text-xs">✓</span>}
               </span>
               <span className="text-[11px] text-gray-500">{c.name}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-card p-5 mb-6">
+        <h3 className="text-sm font-semibold text-gray-900 mb-1">Font style</h3>
+        <p className="text-xs text-gray-500 mb-4">Applied instantly across the whole dashboard.</p>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+          {FONT_OPTIONS.map((f) => (
+            <button
+              key={f.name}
+              onClick={() => selectFont(f)}
+              style={{ fontFamily: f.stack }}
+              className={`text-left px-3 py-2.5 rounded-xl border text-sm transition-colors ${
+                fontFamily === f.stack ? "border-accent bg-gray-50" : "border-gray-200 text-gray-600"
+              }`}
+            >
+              <div className="text-base font-semibold mb-0.5">Aa</div>
+              <div className="text-[11px] text-gray-500" style={{ fontFamily: "inherit" }}>
+                {f.name}
+              </div>
             </button>
           ))}
         </div>
@@ -285,7 +337,7 @@ function ToggleSwitch({ checked, onChange }: { checked: boolean; onChange: (v: b
     <button
       onClick={() => onChange(!checked)}
       className={`w-11 h-6 rounded-full transition-colors relative shrink-0 overflow-hidden ${
-        checked ? "bg-brand-500" : "bg-gray-200"
+        checked ? "bg-accent-solid" : "bg-gray-200"
       }`}
     >
       <span

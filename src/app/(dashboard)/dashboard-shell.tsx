@@ -41,7 +41,7 @@ export default function DashboardShell({
     <>
       <div className="relative p-6 border-b border-surface-border flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-brand-gradient flex items-center justify-center font-bold text-sm">
+          <div className="w-8 h-8 rounded-lg bg-accent-gradient flex items-center justify-center font-bold text-sm">
             L
           </div>
           <span className="font-semibold text-lg tracking-tight">LeadBot</span>
@@ -82,7 +82,7 @@ export default function DashboardShell({
 
       <div className="relative p-4 border-t border-surface-border">
         <div className="flex items-center gap-3 px-2 py-2">
-          <div className="w-9 h-9 rounded-full bg-brand-gradient flex items-center justify-center text-sm font-semibold shrink-0">
+          <div className="w-9 h-9 rounded-full bg-accent-gradient flex items-center justify-center text-sm font-semibold shrink-0">
             {clientName?.[0]?.toUpperCase() || "?"}
           </div>
           <div className="min-w-0">
@@ -116,8 +116,8 @@ export default function DashboardShell({
 
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top bar */}
-        <div className="flex items-center justify-between px-4 sm:px-8 py-3 border-b border-gray-100 bg-white">
-          <button className="md:hidden text-gray-500" onClick={() => setMobileOpen(true)}>
+        <div className="flex items-center justify-between px-4 sm:px-8 py-3 border-b border-surface-border bg-surface">
+          <button className="md:hidden text-white/70" onClick={() => setMobileOpen(true)}>
             <Menu size={22} />
           </button>
           <div className="hidden md:block" />

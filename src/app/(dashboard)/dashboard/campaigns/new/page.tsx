@@ -122,7 +122,7 @@ export default function NewCampaignPage() {
         <button
           type="submit"
           disabled={loading}
-          className="bg-brand-gradient text-white py-2.5 rounded-xl text-sm font-medium mt-2 hover:opacity-90 transition-opacity"
+          className="bg-accent-gradient text-white py-2.5 rounded-xl text-sm font-medium mt-2 hover:opacity-90 transition-opacity"
         >
           {loading ? "Creating..." : "Create Campaign"}
         </button>

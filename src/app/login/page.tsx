@@ -32,7 +32,7 @@ export default function LoginPage() {
     <div className="min-h-screen bg-surface bg-glow flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
         <div className="flex items-center gap-2 justify-center mb-8">
-          <div className="w-9 h-9 rounded-lg bg-brand-gradient flex items-center justify-center font-bold text-white">
+          <div className="w-9 h-9 rounded-lg bg-accent-gradient flex items-center justify-center font-bold text-white">
             L
           </div>
           <span className="font-semibold text-xl text-white tracking-tight">LeadBot</span>
@@ -63,7 +63,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="bg-brand-gradient text-white py-2.5 rounded-xl text-sm font-medium mt-2 hover:opacity-90 transition-opacity"
+              className="bg-accent-gradient text-white py-2.5 rounded-xl text-sm font-medium mt-2 hover:opacity-90 transition-opacity"
             >
               {loading ? "Signing in..." : "Sign in"}
             </button>

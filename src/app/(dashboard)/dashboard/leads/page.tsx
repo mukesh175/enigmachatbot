@@ -154,7 +154,7 @@ export default function LeadsPage() {
           )}
           <button
             onClick={() => exportToExcel(rowsToExport, exportSuffix)}
-            className="flex items-center gap-2 bg-brand-gradient text-white text-sm font-medium px-4 py-2.5 rounded-xl shadow-card hover:opacity-90 transition-opacity"
+            className="flex items-center gap-2 bg-accent-gradient text-white text-sm font-medium px-4 py-2.5 rounded-xl shadow-card hover:opacity-90 transition-opacity"
           >
             <Download size={16} /> Export ({rowsToExport.length})
           </button>
