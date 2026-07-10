@@ -41,14 +41,19 @@ export default function NotificationBell() {
     async function poll() {
       try {
         const res = await fetch("/api/leads");
+        if (!res.ok) return; // e.g. transient 401 right after login — just skip this cycle
         const data = await res.json();
-        const total = (data.leads || []).length;
+        const total = Array.isArray(data.leads) ? data.leads.length : 0;
 
         if (lastCount.current !== null && total > lastCount.current) {
           const newOnes = total - lastCount.current;
           setUnread((prev) => prev + newOnes);
           if (soundEnabled.current) playBeep();
-          if (localStorage.getItem("leadbot_desktop_notifs") === "on" && Notification.permission === "granted") {
+          if (
+            typeof Notification !== "undefined" &&
+            localStorage.getItem("leadbot_desktop_notifs") === "on" &&
+            Notification.permission === "granted"
+          ) {
             new Notification("New lead!", { body: `You have ${newOnes} new lead${newOnes > 1 ? "s" : ""}.` });
           }
         }

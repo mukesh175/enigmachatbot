@@ -149,7 +149,7 @@ export default function SettingsPage() {
   }
 
   function sendTestNotification() {
-    if (Notification.permission === "granted") {
+    if (typeof Notification !== "undefined" && Notification.permission === "granted") {
       new Notification("LeadBot", { body: "This is a test notification 👋" });
     } else {
       toast.show("Enable desktop notifications first", "error");
