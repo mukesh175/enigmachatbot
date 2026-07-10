@@ -4,9 +4,11 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import FlowBuilder from "./flow-builder";
 import { Trash2, Image as ImageIcon, X } from "lucide-react";
+import { useToast } from "@/lib/toast";
 
 export default function CampaignEditor({ campaign }: { campaign: any }) {
   const router = useRouter();
+  const toast = useToast();
   const [status, setStatus] = useState(campaign.status);
   const [mode, setMode] = useState<"ai" | "custom">(campaign.botConfig?.mode || "custom");
   const [goal, setGoal] = useState(campaign.botConfig?.goal || "");
@@ -16,12 +18,9 @@ export default function CampaignEditor({ campaign }: { campaign: any }) {
   const [headerText, setHeaderText] = useState(campaign.botConfig?.headerText || "Chat with us");
   const [bubbleIcon, setBubbleIcon] = useState(campaign.botConfig?.bubbleIcon || "");
   const [logo, setLogo] = useState(campaign.botConfig?.logo || "");
-  const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
 
   async function handleSave() {
-    setSaving(true);
-    setSaved(false);
+    const toastId = toast.show("Saving changes...", "loading");
 
     const branding = { theme, headerText, bubbleIcon, logo };
     const botConfig =
@@ -29,15 +28,17 @@ export default function CampaignEditor({ campaign }: { campaign: any }) {
         ? { ...campaign.botConfig, mode, goal, tone, flow: [], ...branding }
         : { ...campaign.botConfig, mode, flow, ...branding };
 
-    await fetch(`/api/campaigns/${campaign.id}`, {
+    const res = await fetch(`/api/campaigns/${campaign.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status, botConfig }),
     });
 
-    setSaving(false);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+    if (res.ok) {
+      toast.update(toastId, "Changes saved successfully", "success");
+    } else {
+      toast.update(toastId, "Failed to save changes", "error");
+    }
     router.refresh();
   }
 
@@ -54,8 +55,14 @@ export default function CampaignEditor({ campaign }: { campaign: any }) {
 
   async function handleDelete() {
     if (!confirm("Delete this campaign? This cannot be undone.")) return;
-    await fetch(`/api/campaigns/${campaign.id}`, { method: "DELETE" });
-    router.push("/dashboard/campaigns");
+    const toastId = toast.show("Deleting campaign...", "loading");
+    const res = await fetch(`/api/campaigns/${campaign.id}`, { method: "DELETE" });
+    if (res.ok) {
+      toast.update(toastId, "Campaign deleted", "success");
+      router.push("/dashboard/campaigns");
+    } else {
+      toast.update(toastId, "Failed to delete campaign", "error");
+    }
   }
 
   return (
@@ -187,10 +194,10 @@ export default function CampaignEditor({ campaign }: { campaign: any }) {
       <div className="flex items-center gap-3 pt-2 border-t border-gray-100">
         <button
           onClick={handleSave}
-          disabled={saving}
+          disabled={false}
           className="bg-brand-gradient text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:opacity-90 transition-opacity"
         >
-          {saving ? "Saving..." : saved ? "Saved ✓" : "Save changes"}
+          Save changes
         </button>
         <button
           onClick={handleDelete}

@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { UserPlus, Trash2, Shield, Eye } from "lucide-react";
+import { useToast } from "@/lib/toast";
 
 type Member = { id: string; name: string; email: string; role: string; createdAt: string };
 
 export default function TeamPage() {
+  const toast = useToast();
   const [role, setRole] = useState<string | null>(null);
   const [members, setMembers] = useState<Member[]>([]);
   const [name, setName] = useState("");
@@ -32,6 +34,7 @@ export default function TeamPage() {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    const toastId = toast.show("Inviting team member...", "loading");
 
     const res = await fetch("/api/team", {
       method: "POST",
@@ -42,10 +45,13 @@ export default function TeamPage() {
     setLoading(false);
 
     if (!res.ok) {
-      setError(data.error?.formErrors?.join(", ") || data.error || "Failed to invite");
+      const msg = data.error?.formErrors?.join(", ") || data.error || "Failed to invite";
+      setError(msg);
+      toast.update(toastId, msg, "error");
       return;
     }
 
+    toast.update(toastId, "Team member invited successfully", "success");
     setName("");
     setEmail("");
     setPassword("");
@@ -54,7 +60,9 @@ export default function TeamPage() {
 
   async function handleRemove(id: string) {
     if (!confirm("Remove this team member?")) return;
+    const toastId = toast.show("Removing team member...", "loading");
     await fetch(`/api/team/${id}`, { method: "DELETE" });
+    toast.update(toastId, "Team member removed", "success");
     fetchMembers();
   }
 

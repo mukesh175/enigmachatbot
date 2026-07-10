@@ -89,19 +89,40 @@ export async function POST(req: NextRequest) {
       content: text,
     });
 
-    // --- Lead auto-capture: scan message for email/phone ---
+    // --- Lead auto-capture: scan message for email/phone, accumulate both over time ---
     const emailMatch = text.match(EMAIL_RE)?.[0];
     const phoneMatch = text.match(PHONE_RE)?.[0];
 
-    if ((emailMatch || phoneMatch) && !conversation.converted) {
-      await db.insert(leads).values({
-        conversationId,
-        campaignId: conversation.campaignId,
-        clientId: campaign!.clientId,
-        email: emailMatch || null,
-        phone: phoneMatch || null,
-      });
-      await db.update(conversations).set({ converted: true }).where(eq(conversations.id, conversationId));
+    if (emailMatch || phoneMatch) {
+      const [existingLead] = await db
+        .select()
+        .from(leads)
+        .where(eq(leads.conversationId, conversationId))
+        .limit(1);
+
+      if (existingLead) {
+        await db
+          .update(leads)
+          .set({
+            email: existingLead.email || emailMatch || null,
+            phone: existingLead.phone || phoneMatch || null,
+          })
+          .where(eq(leads.id, existingLead.id));
+      } else {
+        await db.insert(leads).values({
+          conversationId,
+          campaignId: conversation.campaignId,
+          clientId: campaign!.clientId,
+          email: emailMatch || null,
+          phone: phoneMatch || null,
+        });
+      }
+
+      const finalEmail = existingLead?.email || emailMatch;
+      const finalPhone = existingLead?.phone || phoneMatch;
+      if (finalEmail && finalPhone && !conversation.converted) {
+        await db.update(conversations).set({ converted: true }).where(eq(conversations.id, conversationId));
+      }
     }
 
     // --- Bot reply logic ---
@@ -122,7 +143,7 @@ export async function POST(req: NextRequest) {
       campaignName: campaign?.name || "this site",
       botConfig: campaign?.botConfig,
       history,
-      leadAlreadyCaptured: conversation.converted || Boolean(emailMatch || phoneMatch),
+      leadAlreadyCaptured: conversation.converted,
     });
 
     await db.insert(messages).values({

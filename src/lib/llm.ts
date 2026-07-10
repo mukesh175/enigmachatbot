@@ -34,7 +34,7 @@ export async function generateBotReply(opts: {
       : "",
     leadAlreadyCaptured
       ? "The visitor's contact info has already been captured — thank them and let them know someone will follow up. Keep answering any further questions helpfully."
-      : "If the visitor hasn't shared their email or phone yet, naturally ask for it once you've built some rapport — don't demand it in the first message.",
+      : "You must collect BOTH the visitor's email address AND their WhatsApp/mobile phone number before the conversation is considered complete — not just one. If they only give one, politely ask for the other before wrapping up. Don't demand both in your very first message — build a little rapport first, then ask for email and phone/WhatsApp together in one message once they show interest.",
     "Keep every reply short: 1-3 sentences. No markdown, no headers, plain conversational text.",
   ]
     .filter(Boolean)

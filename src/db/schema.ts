@@ -23,6 +23,8 @@ export const clients = pgTable("clients", {
   passwordHash: varchar("password_hash", { length: 255 }).notNull(),
   plan: varchar("plan", { length: 50 }).default("free").notNull(),
   isActive: boolean("is_active").default(true).notNull(),
+  avatarUrl: text("avatar_url"),
+  notifyEmailOnLead: boolean("notify_email_on_lead").default(true).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 }, (table) => ({
   emailIdx: uniqueIndex("clients_email_idx").on(table.email),
