@@ -3,6 +3,7 @@ import { campaigns } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
 import { requireClientId } from "@/lib/session";
 import { notFound } from "next/navigation";
+import { headers } from "next/headers";
 import CampaignEditor from "./editor";
 import CopySnippet from "./copy-snippet";
 
@@ -21,8 +22,14 @@ export default async function CampaignDetailPage({ params }: { params: { id: str
     notFound();
   }
 
-  const embedSnippet = `<script src="http://localhost:3000/widget.js" data-embed-key="${campaign.embedKey}" async></script>`;
-  // NOTE: swap http://localhost:3000 for your real deployed domain once you go live on Vercel.
+  // Auto-detects the real domain (localhost while developing, your actual
+  // Vercel domain once deployed) — no more hardcoded/stale URLs in the snippet.
+  const headersList = headers();
+  const host = headersList.get("host");
+  const protocol = host?.includes("localhost") ? "http" : "https";
+  const baseUrl = `${protocol}://${host}`;
+
+  const embedSnippet = `<script src="${baseUrl}/widget.js" data-embed-key="${campaign.embedKey}" async></script>`;
 
   return (
     <div className="max-w-2xl">
