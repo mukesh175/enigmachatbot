@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import SignOutButton from "./sign-out-button";
 import NotificationBell from "./notification-bell";
+import InstallPrompt from "./install-prompt";
 
 const navItems = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
@@ -125,6 +126,8 @@ export default function DashboardShell({
 
         <main className="flex-1 p-4 sm:p-8 overflow-y-auto">{children}</main>
       </div>
+
+      <InstallPrompt />
     </div>
   );
 }

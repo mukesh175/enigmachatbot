@@ -4,16 +4,23 @@ import { useEffect, useRef, useState } from "react";
 import { Bell } from "lucide-react";
 import { useRouter } from "next/navigation";
 
+const SOUND_FREQS: Record<string, number> = { Chime: 880, Ping: 1200, Pop: 600, Silent: 0 };
+
 // Plays a short beep using the Web Audio API — no audio file needed to ship.
 function playBeep() {
+  const soundChoice = localStorage.getItem("leadbot_sound_choice") || "Chime";
+  const freq = SOUND_FREQS[soundChoice] ?? 880;
+  if (freq === 0) return;
+  const volume = Number(localStorage.getItem("leadbot_sound_volume") || 60) / 100;
+
   try {
     const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
     const oscillator = ctx.createOscillator();
     const gain = ctx.createGain();
     oscillator.connect(gain);
     gain.connect(ctx.destination);
-    oscillator.frequency.value = 880;
-    gain.gain.setValueAtTime(0.15, ctx.currentTime);
+    oscillator.frequency.value = freq;
+    gain.gain.setValueAtTime(volume * 0.25, ctx.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
     oscillator.start();
     oscillator.stop(ctx.currentTime + 0.3);
@@ -41,6 +48,9 @@ export default function NotificationBell() {
           const newOnes = total - lastCount.current;
           setUnread((prev) => prev + newOnes);
           if (soundEnabled.current) playBeep();
+          if (localStorage.getItem("leadbot_desktop_notifs") === "on" && Notification.permission === "granted") {
+            new Notification("New lead!", { body: `You have ${newOnes} new lead${newOnes > 1 ? "s" : ""}.` });
+          }
         }
         lastCount.current = total;
       } catch {

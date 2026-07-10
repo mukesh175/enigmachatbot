@@ -14,7 +14,7 @@ export default function CampaignEditor({ campaign }: { campaign: any }) {
   const [goal, setGoal] = useState(campaign.botConfig?.goal || "");
   const [tone, setTone] = useState(campaign.botConfig?.tone || "friendly, concise, helpful");
   const [flow, setFlow] = useState(campaign.botConfig?.flow || []);
-  const [theme, setTheme] = useState(campaign.botConfig?.theme || "#6d3ef7");
+  const [theme, setTheme] = useState(campaign.botConfig?.theme || "#ed5e4e");
   const [headerText, setHeaderText] = useState(campaign.botConfig?.headerText || "Chat with us");
   const [bubbleIcon, setBubbleIcon] = useState(campaign.botConfig?.bubbleIcon || "");
   const [logo, setLogo] = useState(campaign.botConfig?.logo || "");

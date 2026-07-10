@@ -40,6 +40,7 @@ export async function GET(req: NextRequest) {
         campaignName: campaigns.name,
         city: conversations.city,
         country: conversations.country,
+        ipAddress: conversations.ipAddress,
         durationSeconds: conversations.durationSeconds,
         trafficSource: conversations.trafficSource,
         utmCampaign: conversations.utmCampaign,

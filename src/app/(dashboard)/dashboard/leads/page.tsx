@@ -14,6 +14,7 @@ type Lead = {
   campaignName: string;
   city: string | null;
   country: string | null;
+  ipAddress: string | null;
   durationSeconds: number;
   trafficSource: string | null;
   utmCampaign: string | null;
@@ -118,6 +119,7 @@ export default function LeadsPage() {
       Phone: r.phone || "",
       Campaign: r.campaignName,
       Location: [r.city, r.country].filter(Boolean).join(", "),
+      "IP Address": r.ipAddress || "",
       Source: sourceLabels[r.trafficSource || "direct"] || "Direct",
       "UTM Campaign": r.utmCampaign || "",
       "Time on Bot (s)": r.durationSeconds,
@@ -225,6 +227,7 @@ export default function LeadsPage() {
                 <th className="p-3 font-medium">Contact</th>
                 <th className="p-3 font-medium">Campaign</th>
                 <th className="p-3 font-medium">Location</th>
+                <th className="p-3 font-medium">IP Address</th>
                 <th className="p-3 font-medium">Source</th>
                 <th className="p-3 font-medium">Time on bot</th>
                 <th className="p-3 font-medium">Status</th>
@@ -252,6 +255,7 @@ export default function LeadsPage() {
                   </td>
                   <td className="p-3">{r.campaignName}</td>
                   <td className="p-3">{[r.city, r.country].filter(Boolean).join(", ") || "—"}</td>
+                  <td className="p-3 text-gray-500 text-xs">{r.ipAddress || "—"}</td>
                   <td className="p-3">
                     {sourceLabels[r.trafficSource || "direct"] || "Direct"}
                     {r.utmCampaign && <div className="text-gray-400 text-xs">{r.utmCampaign}</div>}
