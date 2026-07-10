@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useSession } from "next-auth/react";
-import { Camera, Bell, Volume2, Palette, Monitor } from "lucide-react";
+import { Camera, Bell, Volume2, Palette, Monitor, Download } from "lucide-react";
 import { useToast } from "@/lib/toast";
 
 const ACCENT_COLORS = [
@@ -171,6 +171,16 @@ export default function SettingsPage() {
     toast.show(`Font changed to ${font.name}`, "success");
   }
 
+  async function handleInstallClick() {
+    const promptEvent = (window as any).__leadbotInstallPrompt;
+    if (!promptEvent) {
+      toast.show("Install isn't available — your browser may not support it, or the app may already be installed", "error");
+      return;
+    }
+    promptEvent.prompt();
+    await promptEvent.userChoice;
+  }
+
   return (
     <div className="max-w-2xl">
       <h1 className="text-2xl font-semibold text-gray-900 mb-1">Profile & Settings</h1>
@@ -327,6 +337,20 @@ export default function SettingsPage() {
             }}
           />
         </div>
+      </div>
+
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-card p-5 mb-6">
+        <h3 className="text-sm font-semibold text-gray-900 mb-1">Install app</h3>
+        <p className="text-xs text-gray-500 mb-4">
+          Install LeadBot for quicker access from your desktop or home screen. Only available in
+          browsers that support it (Chrome, Edge) — not supported in Safari or Firefox.
+        </p>
+        <button
+          onClick={handleInstallClick}
+          className="flex items-center gap-2 bg-accent-gradient text-white text-sm font-medium px-4 py-2.5 rounded-xl hover:opacity-90 transition-opacity"
+        >
+          <Download size={15} /> Install App
+        </button>
       </div>
     </div>
   );
