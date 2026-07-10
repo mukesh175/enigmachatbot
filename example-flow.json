@@ -1,0 +1,34 @@
+[
+  {
+    "id": "welcome",
+    "type": "message",
+    "message": "Hey! Thanks for stopping by 👋"
+  },
+  {
+    "id": "intent",
+    "type": "choice",
+    "message": "What are you interested in?",
+    "image": "https://your-cdn.com/your-campaign-banner.jpg",
+    "options": [
+      { "label": "Digital Marketing", "value": "digital", "next": "digital_goal" },
+      { "label": "Web Design", "value": "web", "next": "contact" },
+      { "label": "Just browsing", "value": "browse", "next": "contact" }
+    ]
+  },
+  {
+    "id": "digital_goal",
+    "type": "choice",
+    "message": "What's your main goal?",
+    "options": [
+      { "label": "More website traffic", "value": "traffic" },
+      { "label": "More sales/leads", "value": "sales" },
+      { "label": "Brand awareness", "value": "brand" }
+    ],
+    "next": "contact"
+  },
+  {
+    "id": "contact",
+    "type": "contact",
+    "message": "Great! Leave your email and WhatsApp number and our team will reach out shortly."
+  }
+]

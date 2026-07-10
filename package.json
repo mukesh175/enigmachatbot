@@ -1,0 +1,40 @@
+{
+  "name": "leadbot-saas",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "db:generate": "cross-env NODE_OPTIONS=--dns-result-order=ipv4first drizzle-kit generate",
+    "db:push": "cross-env NODE_OPTIONS=--dns-result-order=ipv4first drizzle-kit push",
+    "db:studio": "cross-env NODE_OPTIONS=--dns-result-order=ipv4first drizzle-kit studio",
+    "seed": "tsx scripts/seed.ts"
+  },
+  "dependencies": {
+    "next": "14.2.5",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "@neondatabase/serverless": "^0.9.4",
+    "drizzle-orm": "^0.33.0",
+    "next-auth": "^4.24.7",
+    "bcryptjs": "^2.4.3",
+    "nanoid": "^5.0.7",
+    "zod": "^3.23.8",
+    "lucide-react": "^0.383.0",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "drizzle-kit": "^0.24.0",
+    "typescript": "^5.5.4",
+    "@types/node": "^20.14.15",
+    "@types/react": "^18.3.3",
+    "@types/bcryptjs": "^2.4.6",
+    "tsx": "^4.16.2",
+    "dotenv": "^16.4.5",
+    "tailwindcss": "^3.4.7",
+    "postcss": "^8.4.40",
+    "autoprefixer": "^10.4.19"
+  }
+}
