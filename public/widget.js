@@ -70,8 +70,10 @@
     ".wrapper.lb-left .panel{right:auto;left:0;}",
     ".header{background:var(--lb-theme,#ed5e4e);color:#fff;padding:14px 12px;font-size:14px;font-weight:600;",
     "display:flex;align-items:center;gap:8px;}",
-    ".backBtn{background:rgba(255,255,255,.18);border:none;color:#fff;width:26px;height:26px;border-radius:8px;",
-    "cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;}",
+    ".header span{flex:1;}",
+    ".backBtn,.closeBtn{background:rgba(255,255,255,.18);border:none;color:#fff;width:26px;height:26px;",
+    "border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;",
+    "flex-shrink:0;}",
     ".backBtn:disabled{opacity:0;pointer-events:none;}",
     ".messages{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;background:#faf9ff;}",
     ".msg{max-width:82%;padding:9px 13px;border-radius:12px;font-size:13px;line-height:1.45;}",
@@ -114,7 +116,7 @@
   var panel = document.createElement("div");
   panel.className = "panel";
   panel.innerHTML =
-    '<div class="header"><button class="backBtn" id="lb-back" disabled>&#8592;</button><span id="lb-header-text">Chat with us</span></div>' +
+    '<div class="header"><button class="backBtn" id="lb-back" disabled>&#8592;</button><span id="lb-header-text">Chat with us</span><button class="closeBtn" id="lb-close">&times;</button></div>' +
     '<div class="messages" id="lb-messages"></div>' +
     '<div class="inputRow" id="lb-inputRow">' +
     '<input id="lb-input" type="text" placeholder="Type a message..." />' +
@@ -127,6 +129,7 @@
   var inputEl = panel.querySelector("#lb-input");
   var sendBtn = panel.querySelector("#lb-send");
   var backBtn = panel.querySelector("#lb-back");
+  var closeBtn = panel.querySelector("#lb-close");
 
   function clearMessages() {
     messagesEl.innerHTML = "";
@@ -285,26 +288,6 @@
         if (teaserTextEl) teaserTextEl.textContent = data.botConfig.teaserText;
       }
 
-      // Branding: custom bubble icon, header logo, and header text
-      if (data.botConfig && data.botConfig.bubbleIcon) {
-        bubble.innerHTML = "";
-        var bubbleImg = document.createElement("img");
-        bubbleImg.src = data.botConfig.bubbleIcon;
-        bubbleImg.style.cssText = "width:100%;height:100%;object-fit:cover;border-radius:50%;";
-        bubble.appendChild(bubbleImg);
-      }
-
-      var headerTextEl = panel.querySelector("#lb-header-text");
-      if (data.botConfig && data.botConfig.headerText) {
-        headerTextEl.textContent = data.botConfig.headerText;
-      }
-      if (data.botConfig && data.botConfig.logo) {
-        var logoImg = document.createElement("img");
-        logoImg.src = data.botConfig.logo;
-        logoImg.style.cssText = "width:20px;height:20px;border-radius:4px;object-fit:cover;margin-right:2px;";
-        headerTextEl.parentElement.insertBefore(logoImg, headerTextEl);
-      }
-
       if (data.botConfig && Array.isArray(data.botConfig.flow) && data.botConfig.flow.length > 0) {
         state.flow = data.botConfig.flow;
         renderStep(0, false);
@@ -366,6 +349,11 @@
     if (state.open) startConversation();
   });
 
+  closeBtn.addEventListener("click", function () {
+    state.open = false;
+    panel.classList.remove("open");
+  });
+
   // Teaser bubble: shows after a short delay to invite engagement (WhatsApp-style),
   // dismissible with the X, and clicking the teaser itself opens the chat.
   var TEASER_DISMISS_KEY = "leadbot_teaser_dismissed_" + embedKey;
@@ -418,7 +406,8 @@
         if (headerTextEl2 && !headerTextEl2.parentElement.querySelector("img")) {
           var logoImg = document.createElement("img");
           logoImg.src = config.logo;
-          logoImg.style.cssText = "width:20px;height:20px;border-radius:4px;object-fit:cover;margin-right:2px;";
+          logoImg.style.cssText =
+            "width:22px;height:22px;border-radius:6px;object-fit:cover;margin-right:6px;background:#fff;padding:2px;";
           headerTextEl2.parentElement.insertBefore(logoImg, headerTextEl2);
         }
       }
