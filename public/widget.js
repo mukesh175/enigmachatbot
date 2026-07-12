@@ -36,9 +36,12 @@
   };
 
   // ---- Host + Shadow root ----
+  var POSITION = (scriptTag.getAttribute("data-position") || "").toLowerCase();
+
   var host = document.createElement("div");
   host.id = "leadbot-widget-host";
-  host.style.cssText = "position:fixed;bottom:20px;right:20px;z-index:999999;";
+  var sideStyle = POSITION === "bottom-left" ? "left:20px;" : "right:20px;";
+  host.style.cssText = "position:fixed;bottom:20px;" + sideStyle + "z-index:999999;";
   document.body.appendChild(host);
   var shadow = host.attachShadow({ mode: "open" });
 
@@ -47,11 +50,24 @@
     "*{box-sizing:border-box;font-family:system-ui,-apple-system,sans-serif;}",
     ".bubble{width:56px;height:56px;border-radius:50%;background:var(--lb-theme,#ed5e4e);color:#fff;",
     "display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.25);",
-    "font-size:24px;border:none;transition:transform .15s;}",
+    "font-size:24px;border:none;transition:transform .15s;position:relative;}",
     ".bubble:hover{transform:scale(1.05);}",
+    ".bubble::after{content:'';position:absolute;inset:0;border-radius:50%;",
+    "box-shadow:0 0 0 0 var(--lb-theme,#ed5e4e);animation:lb-pulse 2.2s infinite;pointer-events:none;}",
+    "@keyframes lb-pulse{0%{box-shadow:0 0 0 0 rgba(237,94,78,.55);}70%{box-shadow:0 0 0 14px rgba(237,94,78,0);}100%{box-shadow:0 0 0 0 rgba(237,94,78,0);}}",
+    ".teaser{position:absolute;bottom:66px;right:0;background:#fff;color:#222;padding:12px 16px;",
+    "border-radius:16px 16px 4px 16px;box-shadow:0 6px 24px rgba(0,0,0,.2);font-size:13.5px;",
+    "max-width:220px;display:none;align-items:center;gap:8px;animation:lb-pop .25s ease-out;}",
+    ".teaser.show{display:flex;}",
+    ".wrapper.lb-left .teaser{right:auto;left:0;border-radius:16px 16px 16px 4px;}",
+    "@keyframes lb-pop{from{opacity:0;transform:translateY(6px) scale(.95);}to{opacity:1;transform:translateY(0) scale(1);}}",
+    ".teaser .teaserClose{background:#eee;border:none;border-radius:50%;width:18px;height:18px;",
+    "min-width:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;",
+    "color:#888;line-height:1;}",
     ".panel{display:none;flex-direction:column;width:340px;height:480px;background:#fff;border-radius:16px;",
     "box-shadow:0 12px 40px rgba(0,0,0,.28);position:absolute;bottom:68px;right:0;overflow:hidden;}",
     ".panel.open{display:flex;}",
+    ".wrapper.lb-left .panel{right:auto;left:0;}",
     ".header{background:var(--lb-theme,#ed5e4e);color:#fff;padding:14px 12px;font-size:14px;font-weight:600;",
     "display:flex;align-items:center;gap:8px;}",
     ".backBtn{background:rgba(255,255,255,.18);border:none;color:#fff;width:26px;height:26px;border-radius:8px;",
@@ -79,6 +95,7 @@
   shadow.appendChild(style);
 
   var wrapper = document.createElement("div");
+  wrapper.className = "wrapper" + (POSITION === "bottom-left" ? " lb-left" : "");
   wrapper.style.position = "relative";
   shadow.appendChild(wrapper);
 
@@ -86,6 +103,13 @@
   bubble.className = "bubble";
   bubble.innerHTML = "💬";
   wrapper.appendChild(bubble);
+
+  var teaser = document.createElement("div");
+  teaser.className = "teaser";
+  teaser.innerHTML =
+    '<span id="lb-teaser-text">Hello 👋 How can I help you?</span>' +
+    '<button class="teaserClose" id="lb-teaser-close">&times;</button>';
+  wrapper.appendChild(teaser);
 
   var panel = document.createElement("div");
   panel.className = "panel";
@@ -256,6 +280,10 @@
       if (data.botConfig && data.botConfig.theme) {
         wrapper.style.setProperty("--lb-theme", data.botConfig.theme);
       }
+      if (data.botConfig && data.botConfig.teaserText) {
+        var teaserTextEl = teaser.querySelector("#lb-teaser-text");
+        if (teaserTextEl) teaserTextEl.textContent = data.botConfig.teaserText;
+      }
 
       // Branding: custom bubble icon, header logo, and header text
       if (data.botConfig && data.botConfig.bubbleIcon) {
@@ -334,7 +362,69 @@
   bubble.addEventListener("click", function () {
     state.open = !state.open;
     panel.classList.toggle("open", state.open);
+    teaser.classList.remove("show"); // hide teaser once they engage with the bubble
     if (state.open) startConversation();
+  });
+
+  // Teaser bubble: shows after a short delay to invite engagement (WhatsApp-style),
+  // dismissible with the X, and clicking the teaser itself opens the chat.
+  var TEASER_DISMISS_KEY = "leadbot_teaser_dismissed_" + embedKey;
+  if (!sessionStorage.getItem(TEASER_DISMISS_KEY)) {
+    setTimeout(function () {
+      if (!state.open) teaser.classList.add("show");
+    }, 3000);
+  }
+
+  var teaserCloseBtn = teaser.querySelector("#lb-teaser-close");
+  if (teaserCloseBtn) {
+    teaserCloseBtn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      teaser.classList.remove("show");
+      sessionStorage.setItem(TEASER_DISMISS_KEY, "1");
+    });
+  }
+
+  // Fetch branding (theme, bubble icon, teaser text) immediately on load —
+  // separate from starting a conversation, so this happens even for visitors
+  // who never click the bubble, and doesn't create a conversation row per view.
+  fetch(API_BASE + "/api/chat/config/" + embedKey)
+    .then(function (res) { return res.ok ? res.json() : null; })
+    .then(function (config) {
+      if (!config) return;
+      if (config.theme) wrapper.style.setProperty("--lb-theme", config.theme);
+      if (config.headerText) {
+        var headerTextEl = panel.querySelector("#lb-header-text");
+        if (headerTextEl) headerTextEl.textContent = config.headerText;
+      }
+      if (config.teaserText) {
+        var teaserTextEl = teaser.querySelector("#lb-teaser-text");
+        if (teaserTextEl) teaserTextEl.textContent = config.teaserText;
+      }
+      if (config.bubbleIcon) {
+        bubble.innerHTML = "";
+        var bubbleImg = document.createElement("img");
+        bubbleImg.src = config.bubbleIcon;
+        bubbleImg.style.cssText = "width:100%;height:100%;object-fit:cover;border-radius:50%;";
+        bubble.appendChild(bubbleImg);
+      }
+      if (config.logo) {
+        var headerTextEl2 = panel.querySelector("#lb-header-text");
+        if (headerTextEl2 && !headerTextEl2.parentElement.querySelector("img")) {
+          var logoImg = document.createElement("img");
+          logoImg.src = config.logo;
+          logoImg.style.cssText = "width:20px;height:20px;border-radius:4px;object-fit:cover;margin-right:2px;";
+          headerTextEl2.parentElement.insertBefore(logoImg, headerTextEl2);
+        }
+      }
+    })
+    .catch(function () {}); // best-effort — teaser/bubble still work with defaults if this fails
+
+  teaser.addEventListener("click", function (e) {
+    if (e.target.id === "lb-teaser-close") return;
+    teaser.classList.remove("show");
+    state.open = true;
+    panel.classList.add("open");
+    startConversation();
   });
 
   sendBtn.addEventListener("click", sendFreeformMessage);

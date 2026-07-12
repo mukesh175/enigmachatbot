@@ -16,13 +16,15 @@ export default function CampaignEditor({ campaign }: { campaign: any }) {
   const [flow, setFlow] = useState(campaign.botConfig?.flow || []);
   const [theme, setTheme] = useState(campaign.botConfig?.theme || "#ed5e4e");
   const [headerText, setHeaderText] = useState(campaign.botConfig?.headerText || "Chat with us");
+  const [teaserText, setTeaserText] = useState(campaign.botConfig?.teaserText || "Hello 👋 How can I help you?");
   const [bubbleIcon, setBubbleIcon] = useState(campaign.botConfig?.bubbleIcon || "");
   const [logo, setLogo] = useState(campaign.botConfig?.logo || "");
+  const [position, setPosition] = useState(campaign.botConfig?.position || "bottom-right");
 
   async function handleSave() {
     const toastId = toast.show("Saving changes...", "loading");
 
-    const branding = { theme, headerText, bubbleIcon, logo };
+    const branding = { theme, headerText, teaserText, bubbleIcon, logo, position };
     const botConfig =
       mode === "ai"
         ? { ...campaign.botConfig, mode, goal, tone, flow: [], ...branding }
@@ -112,6 +114,29 @@ export default function CampaignEditor({ campaign }: { campaign: any }) {
               placeholder="Chat with us"
               className="block w-full mt-1 px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-300"
             />
+          </label>
+
+          <label className="text-sm text-gray-700 sm:col-span-2">
+            Teaser message
+            <p className="text-xs text-gray-400 mb-1">Pops up next to the bubble a few seconds after the page loads, before anyone clicks — like WhatsApp's chat widget.</p>
+            <input
+              value={teaserText}
+              onChange={(e) => setTeaserText(e.target.value)}
+              placeholder="Hello 👋 How can I help you?"
+              className="block w-full mt-1 px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-300"
+            />
+          </label>
+
+          <label className="text-sm text-gray-700">
+            Widget position
+            <select
+              value={position}
+              onChange={(e) => setPosition(e.target.value)}
+              className="block w-full mt-1 px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-300"
+            >
+              <option value="bottom-right">Bottom right (default)</option>
+              <option value="bottom-left">Bottom left</option>
+            </select>
           </label>
 
           <ImagePicker

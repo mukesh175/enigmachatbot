@@ -29,7 +29,8 @@ export default async function CampaignDetailPage({ params }: { params: { id: str
   const protocol = host?.includes("localhost") ? "http" : "https";
   const baseUrl = `${protocol}://${host}`;
 
-  const embedSnippet = `<script src="${baseUrl}/widget.js" data-embed-key="${campaign.embedKey}" async></script>`;
+  const position = (campaign.botConfig as any)?.position || "bottom-right";
+  const embedSnippet = `<script src="${baseUrl}/widget.js" data-embed-key="${campaign.embedKey}" data-position="${position}" async></script>`;
 
   return (
     <div className="max-w-2xl">
