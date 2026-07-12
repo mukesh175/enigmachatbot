@@ -33,6 +33,7 @@ export async function GET(_req: NextRequest, { params }: { params: { embedKey: s
       bubbleIcon: config?.bubbleIcon,
       logo: config?.logo,
       teaserText: config?.teaserText,
+      position: config?.position,
     });
   } catch (err) {
     console.error(err);

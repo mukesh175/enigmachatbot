@@ -55,15 +55,15 @@
     ".bubble::after{content:'';position:absolute;inset:0;border-radius:50%;",
     "box-shadow:0 0 0 0 var(--lb-theme,#ed5e4e);animation:lb-pulse 2.2s infinite;pointer-events:none;}",
     "@keyframes lb-pulse{0%{box-shadow:0 0 0 0 rgba(237,94,78,.55);}70%{box-shadow:0 0 0 14px rgba(237,94,78,0);}100%{box-shadow:0 0 0 0 rgba(237,94,78,0);}}",
-    ".teaser{position:absolute;bottom:66px;right:0;background:#fff;color:#222;padding:12px 16px;",
-    "border-radius:16px 16px 4px 16px;box-shadow:0 6px 24px rgba(0,0,0,.2);font-size:13.5px;",
-    "max-width:220px;display:none;align-items:center;gap:8px;animation:lb-pop .25s ease-out;}",
-    ".teaser.show{display:flex;}",
+    ".teaser{position:absolute;bottom:66px;right:0;background:#fff;color:#222;padding:14px 32px 14px 16px;",
+    "border-radius:16px 16px 4px 16px;box-shadow:0 6px 24px rgba(0,0,0,.2);font-size:14px;line-height:1.45;",
+    "width:230px;display:none;animation:lb-pop .25s ease-out;}",
+    ".teaser.show{display:block;}",
     ".wrapper.lb-left .teaser{right:auto;left:0;border-radius:16px 16px 16px 4px;}",
     "@keyframes lb-pop{from{opacity:0;transform:translateY(6px) scale(.95);}to{opacity:1;transform:translateY(0) scale(1);}}",
-    ".teaser .teaserClose{background:#eee;border:none;border-radius:50%;width:18px;height:18px;",
-    "min-width:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;",
-    "color:#888;line-height:1;}",
+    ".teaser .teaserClose{position:absolute;top:8px;right:8px;background:#f2f2f2;border:none;",
+    "border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;",
+    "cursor:pointer;font-size:13px;color:#888;line-height:1;padding:0;}",
     ".panel{display:none;flex-direction:column;width:340px;height:480px;background:#fff;border-radius:16px;",
     "box-shadow:0 12px 40px rgba(0,0,0,.28);position:absolute;bottom:68px;right:0;overflow:hidden;}",
     ".panel.open{display:flex;}",
@@ -406,6 +406,12 @@
         bubbleImg.src = config.bubbleIcon;
         bubbleImg.style.cssText = "width:100%;height:100%;object-fit:cover;border-radius:50%;";
         bubble.appendChild(bubbleImg);
+      }
+      if (config.position === "bottom-left" || config.position === "bottom-right") {
+        var isLeft = config.position === "bottom-left";
+        host.style.left = isLeft ? "20px" : "";
+        host.style.right = isLeft ? "" : "20px";
+        wrapper.classList.toggle("lb-left", isLeft);
       }
       if (config.logo) {
         var headerTextEl2 = panel.querySelector("#lb-header-text");
